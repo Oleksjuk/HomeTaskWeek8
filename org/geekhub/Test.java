@@ -14,7 +14,7 @@ import java.util.List;
 
 public class Test {
     public static void main(String[] args) throws Exception {
-        Connection connection = createConnection("root", "admin", "geekdb");
+        Connection connection = createConnection("root", "", "geekdb");
 
         Storage storage = new DatabaseStorage(connection);
         List<Cat> cats = storage.list(Cat.class);
@@ -41,11 +41,9 @@ public class Test {
         user.setBalance(22.23);
         storage.save(user);
 
-        List<User> users = storage.list(User.class);
-        if (users.isEmpty()) throw new Exception("At least one user should be exist!");
-        User user1 = users.get(0);
+        User user1 = storage.get(User.class, user.getId());
         if (!user1.getName().equals(user.getName())) throw new Exception("Users should be equals!");
-        user.setId(user1.getId());
+
         user.setAdmin(false);
         storage.save(user);
 

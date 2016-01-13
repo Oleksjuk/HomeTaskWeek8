@@ -87,12 +87,18 @@ public class DatabaseStorage implements Storage {
             sql = sqlBuild.toString();
         }
 
-        try (PreparedStatement statement = connection.prepareStatement(sql)){
+        try (PreparedStatement statement = connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS)){
             int i = 1;
             for (String fieldName: data.keySet()){
                 statement.setObject(i++, data.get(fieldName));
             }
-            statement.executeUpdate();
+            if (statement.executeUpdate() > 0 && entity.isNew()) {
+                ResultSet generatedKeys = statement.getGeneratedKeys();
+
+                if (null!=generatedKeys && generatedKeys.next()) {
+                    entity.setId(generatedKeys.getInt(1));
+                }
+            }
         }
     }
 
